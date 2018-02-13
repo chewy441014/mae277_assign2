@@ -1,10 +1,10 @@
-function analysis(sysModel, sysCL, K, L, Ts)
+function analysis(sysModel, sysCL, K, L, Hz)
     %% ============================== %%
     % :param sysModel: System data
     % :param sysCL: Closed loop model
     % :param K: Controller gain
     % :param L: Observer gain
-    % :param Ts: Frequency in Hz
+    % :param Hz: Frequency in Hz
 
     [Ac, Bc, Cc, Dc] = ssdata(sysModel);
     nStates = size(Ac, 1);
@@ -15,12 +15,12 @@ function analysis(sysModel, sysCL, K, L, Ts)
     %% ============================== %%
     %% Closed-loop Plant Frequency Response
     sysCL_Gc = sysCL * N;
-    figure(Ts*10+1);
+    figure(Hz*10+1);
     step(sysCL_Gc); title('Closed-Loop Plant Frequency Response');
 
     %% ============================== %%
     %% Time-Domain Analysis
-    figure(Ts*10+2);
+    figure(Hz*10+2);
     step(sysCL_Gc); title('Step Response');
     stepInfo = stepinfo(sysCL_Gc);
 
@@ -33,10 +33,10 @@ function analysis(sysModel, sysCL, K, L, Ts)
     loopGain = minreal(-series(-ctrlFB, sysModel));
 
     % Stability Margins
-    figure(Ts*10+3);
+    figure(Hz*10+3);
     bode(loopGain); title([sysCL.Name, ' Loop Gain']);
 
-    figure(Ts*10+4);
+    figure(Hz*10+4);
     nyquist(loopGain); title([sysCL.Name, ' Nyquist']);
 
     % Sensitivity
@@ -44,12 +44,12 @@ function analysis(sysModel, sysCL, K, L, Ts)
     S_peak = getPeakGain(S);
     VGM = S_peak / (S_peak - 1);
 
-    figure(Ts*10+5);
+    figure(Hz*10+5);
     bodemag(S); title([sysCL.Name, ' Sensitivity']);
 
     % Complementary Sensitivity
     T = feedback(loopGain, 1);
 
-    figure(Ts*10+6);
+    figure(Hz*10+6);
     bodemag(T); title([sysCL.Name, ' Complementary Sensitivity']);
 end
