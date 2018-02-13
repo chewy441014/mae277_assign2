@@ -62,37 +62,15 @@ disp(rank(obsv(sys_c.A,sys_c.C)));
 %% Direct Digital Control Design
 Kp = [0.8+0.15i, 0.8-0.15i];
 Lp = Kp/10;
-
-K_d = cell(1,length(T));
-L_d = cell(1,length(T));
-sys_dd = cell(1,length(T)); 
-Lz_d = cell(1,length(T));   % Loop Gain
-
-S_dd = cell(1,length(T));   % Sensitivity
-PeakS_dd = cell(1,length(T)); % Peak value of Sensitivity
-VGM_dd = cell(1,length(T)); % Vector Gain Margin
-R_dd = cell(1,length(T));   % Robustness
-
-%%% Analyze Indirect and Direct Control
 for tdx = 1:length(T)
     Ts = T(tdx);
-    [K_d{tdx},L_d{tdx},sys_dd{tdx},Lz_d{tdx}] = dcontrold_dir(sys_c, Kp, Lp, Ts);
-    S_dd{tdx} = 1/(1 + Lz_d{tdx}); PeakS_dd{tdx} = getPeakGain(S_dd{tdx});
-    R_dd{tdx} = Lz_d{tdx}/(1 + Lz_d{tdx});
-    VGM_dd{tdx} = PeakS_dd{tdx}/(PeakS_dd{tdx} - 1); 
-    
-    % sys_dd is the direct design estimator feedback system 
-    sys_dd{tdx}.Name = [num2str(1/T(tdx)),' Hz'];
-    disp(['VGM is ',num2str(VGM_dd{tdx}), ' for ',sys_dd{tdx}.Name,' case']);
-    
-    % TODO: figure numbering
-    figure; bode(Lz_d{tdx}); title([sys_dd{tdx}.Name,' Closed Loop Bode']);
-    figure; nyquist(Lz_d{tdx}); axis equal; title([sys_dd{tdx}.Name,' Nyquist']);
-    figure; bodemag(S_dd{tdx});  title([sys_dd{tdx}.Name,' Sensitivity']);
-    figure; bodemag(R_dd{tdx});  title([sys_dd{tdx}.Name,' Robustness']);
+    [K_d,L_d,sys_dd] = dcontrold_dir(sys_c, Kp, Lp, Ts);
+    analysis(sys_c, sys_dd, K_d, L_d, 1/Ts);
 end
+    
+
 
 % Step Response % TODO
-opt = stepDataOptions('StepAmplitude',0.2);
-step(sys_dd{1},sys_dd{2},sys_dd{3},opt); title('Step Response Comparison');
-legend(sys_dd{1}.Name,sys_dd{2}.Name,sys_dd{3}.Name,'Location','southeast')
+% opt = stepDataOptions('StepAmplitude',0.2);
+% step(sys_dd{1},sys_dd{2},sys_dd{3},opt); title('Step Response Comparison');
+% legend(sys_dd{1}.Name,sys_dd{2}.Name,sys_dd{3}.Name,'Location','southeast')
