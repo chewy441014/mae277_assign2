@@ -1,4 +1,4 @@
-function [K,L,sys,Lz] = dcontrold_dir(sys_c, Kp, Lp, Ts)
+function [K,L,sys] = dcontrold_dir(sys_c, Kp, Lp, Ts)
     % Takes the continuous time LTI open loop plant and applies 
     % state estimator feedback control. 
     
@@ -24,7 +24,7 @@ function [K,L,sys,Lz] = dcontrold_dir(sys_c, Kp, Lp, Ts)
     L = place(A',C',Lp)';
     
     % Lz: Loop Gain
-    Lz = ss(A - L*C - B*K, L, K, 0, Ts) * ss(A, B, C, 0, Ts);
+    % Lz = ss(A - L*C - B*K, L, K, 0, Ts) * ss(A, B, C, 0, Ts);
     
     % sys: Closed Loop System
     nState = size(A,1);
@@ -32,7 +32,7 @@ function [K,L,sys,Lz] = dcontrold_dir(sys_c, Kp, Lp, Ts)
     Ao = [A - B*K, B*K; zeros(size(A)), A - L*C];
     Bo = [B*N; zeros(size(B))];
     Co = [C, zeros((size(C)))];
-    sys = ss(Ao, Bo, Co, 0, Ts);
+    sys = minreal(ss(Ao, Bo, Co, 0, Ts));
 
     % Return the observer and state feedback gains and the 
     % new system model for analysis
