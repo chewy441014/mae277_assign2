@@ -1,4 +1,8 @@
-function [K,L,sysCL] = dcontrold_ind(sys_c)
+function [K,L,sysCL] = dcontrold_ind(sys_c, desFPPoles, desObsPoles)
+% :param sys_c: Actual system
+% :param desFPPoles: Desired feedback poles
+% :param desObsPoles: Desired observer poles
+
     % Controller is discretized for:
     T = [1/10,1/100,1/1000]; 
     
@@ -11,9 +15,7 @@ function [K,L,sysCL] = dcontrold_ind(sys_c)
     
     % Estimator and State Feedback gains are decided by 
     % continuous time plant analysis
-    desFbPoles = [-10, -40];
     K = place(Ac, Bc, desFbPoles);
-    desObsPoles = 10*desFbPoles;
     L = place(Ac', Cc', desObsPoles).';
     
     % Stabilized system
