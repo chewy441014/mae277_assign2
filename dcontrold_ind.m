@@ -27,4 +27,5 @@ function [K,L,sysCL] = dcontrold_ind(sys_c, desFbPoles, desObsPoles)
     % Return the observer and state feedback gains and the 
     % new system model for analysis
     sysCL = minreal(ss(A_stb, Bc, Cc, zeros(nInputs, nOutputs)));
+    sysCL.Name = 'Indirect Control';
 end
