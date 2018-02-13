@@ -27,10 +27,8 @@ function [K,L,sys] = dcontrold_dir(sys_c, Kp, Lp, Ts)
     % Lz = ss(A - L*C - B*K, L, K, 0, Ts) * ss(A, B, C, 0, Ts);
     
     % sys: Closed Loop System
-    nState = size(A,1);
-    N = 1/(C * inv(eye(nState) - A+B*K) * B);
     Ao = [A - B*K, B*K; zeros(size(A)), A - L*C];
-    Bo = [B*N; zeros(size(B))];
+    Bo = [B; zeros(size(B))];
     Co = [C, zeros((size(C)))];
     sys = minreal(ss(Ao, Bo, Co, 0, Ts));
 
