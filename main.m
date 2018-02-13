@@ -1,9 +1,10 @@
 %%% Main Function for MAE277
 %%% Min, Hosik, Preston
 
+%% Initialize Env
 clc; clear; close all;
 
-%%%
+%% Model Identification
 % Motor Parameters
 LinkLength = 0.0508;        % 2 inches due to mounting
 LinkMass   = 0.045;         % 45 grams
@@ -20,9 +21,8 @@ J_total    = J_motor + J_link;
 kappa = Vs/Km;
 tau = J_total*R_dd/(Km^2);
 T = [1/10, 1/100, 1/1000];
-n = length(T);
 
-%%%
+%% Dynamic Model, Matrix Representation
 % Continuous Time Model LTI State Space System
 % Inverted Pendulum
 A = [0, 1; (3*g)/(2*J_total), -3*(Km^2)/(LinkMass*(J_total^2)*R_dd)];
@@ -32,44 +32,51 @@ D = 0;
 
 sys_c = ss(A,B,C,D);
 
-% Controllability & Observability of the Continuous-Time
+%% Controllability & Observability of the Continuous-Time
 % Open Loop System
 disp('Controllability of CT System');
 disp(rank(ctrb(sys_c.A,sys_c.B)));
 disp('Observability of CT System');
 disp(rank(obsv(sys_c.A,sys_c.C)));
 
-%%% Indirect Digital Control Design
+%% Indirect Digital Control Design
 % [K_i,L_i,sys_id] = dcontrold_ind(sys_c);
 % sys_id is the indirect design estimator feedback system
 
-%%% Direct Digital Control Design
-[K_d,L_d,sys_dd,Lz_d] = dcontrold_dir(sys_c);
-% sys_dd is the direct design estimator feedback system 
-sys_dd{1}.Name = [num2str(1/T(1)),' Hz'];
-sys_dd{2}.Name = [num2str(1/T(2)),' Hz'];
-sys_dd{3}.Name = [num2str(1/T(3)),' Hz'];
+%% Direct Digital Control Design
+Kp = [0.8+0.15i, 0.8-0.15i];
+Lp = Kp/10;
+
+K_d = cell(1,length(T));
+L_d = cell(1,length(T));
+sys_dd = cell(1,length(T)); 
+Lz_d = cell(1,length(T));   % Loop Gain
+
+S_dd = cell(1,length(T));   % Sensitivity
+PeakS_dd = cell(1,length(T)); % Peak value of Sensitivity
+VGM_dd = cell(1,length(T)); % Vector Gain Margin
+R_dd = cell(1,length(T));   % Robustness
 
 %%% Analyze Indirect and Direct Control
-% Step Response
+for tdx = 1:length(T)
+    Ts = T(tdx);
+    [K_d{tdx},L_d{tdx},sys_dd{tdx},Lz_d{tdx}] = dcontrold_dir(sys_c, Kp, Lp, Ts);
+    S_dd{tdx} = 1/(1 + Lz_d{tdx}); PeakS_dd{tdx} = getPeakGain(S_dd{tdx});
+    R_dd{tdx} = Lz_d{tdx}/(1 + Lz_d{tdx});
+    VGM_dd{tdx} = PeakS_dd{tdx}/(PeakS_dd{tdx} - 1); 
+    
+    % sys_dd is the direct design estimator feedback system 
+    sys_dd{tdx}.Name = [num2str(1/T(tdx)),' Hz'];
+    disp(['VGM is ',num2str(VGM_dd{tdx}), ' for ',sys_dd{tdx}.Name,' case']);
+    
+    % TODO: figure numbering
+    figure; bode(Lz_d{tdx}); title([sys_dd{tdx}.Name,' Closed Loop Bode']);
+    figure; nyquist(Lz_d{tdx}); axis equal; title([sys_dd{tdx}.Name,' Nyquist']);
+    figure; bodemag(S_dd{tdx});  title([sys_dd{tdx}.Name,' Sensitivity']);
+    figure; bodemag(R_dd{tdx});  title([sys_dd{tdx}.Name,' Robustness']);
+end
+
+% Step Response % TODO
 opt = stepDataOptions('StepAmplitude',0.2);
 step(sys_dd{1},sys_dd{2},sys_dd{3},opt); title('Step Response Comparison');
 legend(sys_dd{1}.Name,sys_dd{2}.Name,sys_dd{3}.Name,'Location','southeast')
-
-% Loop Gain
-S_dd = cell(1,n);
-PeakS_dd = cell(1,n);
-VGM_dd = cell(1,n);
-R_dd = cell(1,n);
-for i = 1:n
-    figure; bode(Lz_d{i}); title([sys_dd{i}.Name,' Closed Loop Bode']);
-    figure; nyquist(Lz_d{i}); axis equal; title([sys_dd{i}.Name,' Nyquist']);
-    %Sensitivity
-    S_dd{i} = 1/(1 + Lz_d{i}); PeakS_dd{i} = getPeakGain(S_dd{i});
-    %Robustness
-    R_dd{i} = Lz_d{i}/(1 + Lz_d{i});
-    %Vector Gain Margin
-    VGM_dd{i} = PeakS_dd{i}/(PeakS_dd{i} - 1); disp(['VGM is ',num2str(VGM_dd{i}), ' for ',sys_dd{i}.Name,' case']);
-    figure; bodemag(S_dd{i});  title([sys_dd{i}.Name,' Sensitivity']);
-    figure; bodemag(R_dd{i});  title([sys_dd{i}.Name,' Robustness']);
-end
