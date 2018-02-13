@@ -1,19 +1,28 @@
-function [K,L,sys] = dcontrold_ind(sys_c)
-    % Takes the continuous time LTI open loop plant and applies 
-    % state estimator feedback control. 
-    
-    % Estimator and State Feedback gains are decided by 
-    % continuous time plant analysis
-    Lp = [];
-    Kp = [];
-    
-    % Pole placement is performed for desired continuous time 
-    % poles
-    
+function [K,L,sysCL] = dcontrold_ind(sys_c)
     % Controller is discretized for:
     T = [1/10,1/100,1/1000]; 
     
+    % Takes the continuous time LTI open loop plant and applies 
+    % state estimator feedback control.
+    [Ac, Bc, Cc, Dc] = ssdata(sys_c);
+    nStates = size(Ac, 1);
+    nInputs = size(Bc, 2);
+    nOutputs = size(Cc, 1);
+    
+    % Estimator and State Feedback gains are decided by 
+    % continuous time plant analysis
+    desFbPoles = [-10, -40];
+    K = place(Ac, Bc, desFbPoles);
+    desObsPoles = 10*desFbPoles;
+    L = place(Ac', Cc', desObsPoles).';
+    
+    % Stabilized system
+    A_stb = Ac - Bc*K;
+    
+    % Feedforward gain
+    N = 1 / (Cc * inv(-A_stb) * Bc);
+    
     % Return the observer and state feedback gains and the 
     % new system model for analysis
-    
+    sysCL = minreal(ss(A_stb, Bc, Cc, zeros(nInputs, nOutputs)));
 end
