@@ -1,4 +1,4 @@
-function [K,L,sysCL] = dcontrold_ind(sys_c, desFPPoles, desObsPoles)
+function [K,L,sysCL] = dcontrold_ind(sys_c, desFbPoles, desObsPoles)
 % :param sys_c: Actual system
 % :param desFPPoles: Desired feedback poles
 % :param desObsPoles: Desired observer poles
