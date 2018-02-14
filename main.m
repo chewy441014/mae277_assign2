@@ -81,8 +81,5 @@ end
 % State estimator feedback matrix
 sys_sefb = sysStateEstimatorFeedback(sys_dd, K_d, L_d);
 
-% Construct a 2 Hz sine wave
-w = 2;
-t = [0:Ts:10];
-r = sin(2*pi*w*t);
-[y, t, x] = lsim(sys_sefb, r, t);
+% Track a 2 Hz sine wave without an internal model
+sineWaveTracker(sys_sefb, 2, Ts);
