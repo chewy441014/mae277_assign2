@@ -4,13 +4,18 @@ function [ sys_sefb ] = sysStateEstimatorFeedback( sys, K, L )
 %   that represents the state estimator feedback system.
 
 [A, B, C, D, Ts] = ssdata(sys);
-As = [  A - B * K,      B * K           ;
-        0               A - L * C       ];
+
+nStates = size(A, 1);
+nInputs = size(B, 2);
+nOutputs = size(C, 1);
+
+As = [  A - B * K,              B * K           ;
+        zeros(nStates)          A - L * C       ];
 
 Bs = [  B   ;
-        0   ];
+        zeros(nStates, nInputs)   ];
 
-Cs = [  C,              0               ];
+Cs = [  C,                      zeros(nOutputs, nStates)  ];
 
 Ds = 0;
 
