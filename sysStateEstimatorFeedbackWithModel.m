@@ -1,4 +1,4 @@
-function [ sys_CL, Lz ] = sysStateEstimatorFeedbackWithModel( sys, w )
+function [ sysCL, Lz ] = sysStateEstimatorFeedbackWithModel( sys, w )
 %SYSSTATEESTIMATORFEEDBACKWITHMODEL Build the state estimator feedback
 %matrix with an internal model included.
 %   Detailed explanation goes here
@@ -41,13 +41,13 @@ Baug = [    Bp                              ;
 Baugr = [   zeros(nStates, nInputsModel)    ;
             -Bm                             ];
 
-Caug = [    C,              zeros(nOutputsModel, nStatesModel)   ];
+Caug = [    Cp,             zeros(nOutputsModel, nStatesModel)   ];
 
 %% =============================== %%
 %% State Feedback Controller
 Qfb = [ 100000*eye(2),  zeros(2,2)      ;
-        zeros(2,2),     10000*eye(2)    ];
-Rfb = 100000;
+        zeros(2,2),     100000*eye(2)    ];
+Rfb = 1000000;
 [Kaug, ~, ~] = dlqr(Aaug, Baug, Qfb, Rfb);
 K = Kaug(1:nStates);
 Km = Kaug(nStates + 1:end);
@@ -62,10 +62,10 @@ Rob = 0.01;
 %% =============================== %%
 %% Closed-Loop System %%
 Acl = [ Aaug - Baug*Kaug,                       Baug*K          ;
-        zeros(nStates, nStates+nStatesModel)    Ap - L * Ac     ];
+        zeros(nStates, nStates+nStatesModel)    Ap - L * Cp     ];
 
-Bcl = [ Baug + Baugr    ;
-        zeros(nStates)  ];
+Bcl = [ Baug + Baugr                ;
+        zeros(nStates, nInputs)     ];
     
 Ccl = [ Caug,       zeros(nOutputs, nStates)    ];
 
@@ -75,7 +75,7 @@ sysCL = ss(Acl, Bcl, Ccl, Dcl, Ts);
 
 %% =============================== %%
 %% Loop Gain %%
-Lz = - ss(Ap - L*Ap - Bp*K, Bp, K, 0, Ts) * ss(Am, Bm, Km, 0, Ts) * ss(Ap, Bp, Cp, 0, Ts) ...
+Lz = - ss(Ap - L*Cp - Bp*K, Bp, K, 0, Ts) * ss(Am, Bm, Km, 0, Ts) * ss(Ap, Bp, Cp, 0, Ts) ...
      + ss(Ap - L*Cp - Bp*K, L, K, 0, Ts) * ss(Ap, Bp, Cp, 0, Ts) ...
      + ss(Am, Bm, Km, 0, Ts) * ss(Ap, Bp, Cp, 0, Ts);
  

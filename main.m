@@ -83,3 +83,7 @@ sys_sefb = sysStateEstimatorFeedback(sys_dd, K_d, L_d);
 
 % Track a 2 Hz sine wave without an internal model
 sineWaveTracker(sys_sefb, 2, Ts);
+
+%% Problem # 7.b
+
+[sys_CLModel, LzModel] = sysStateEstimatorFeedbackWithModel(sys_dd, 2);
