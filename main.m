@@ -74,3 +74,9 @@ end
 % opt = stepDataOptions('StepAmplitude',0.2);
 % step(sys_dd{1},sys_dd{2},sys_dd{3},opt); title('Step Response Comparison');
 % legend(sys_dd{1}.Name,sys_dd{2}.Name,sys_dd{3}.Name,'Location','southeast')
+
+
+%% Problem # 7.a
+
+% State estimator feedback matrix
+sys_sefb = sysStateEstimatorFeedback(sys_dd, K_d, L_d);
