@@ -30,7 +30,7 @@ function analysisGivenLoopGain( loopGain, idt )
     axis equal;    grid;
 
     % Sensitivity
-    S = 1/(1 + loopGain);
+    S = 1/(1 + loopGain); % feedback(1,loopGain);
     S_peak = getPeakGain(S);
     VGM = S_peak / (S_peak - 1);
 
