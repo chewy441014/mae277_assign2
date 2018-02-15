@@ -3,8 +3,8 @@ function [ sysCL, Lz ] = sysStateEstimatorFeedbackWithModel( sys, w )
 %matrix with an internal model included.
 %   Detailed explanation goes here
 
-% Extract the state-space model and sampling rate of the plant
-[Ap, Bp, Cp, Dp, Ts] = ssdata(sys)
+% Extract the discrete-time state-space model and sampling rate of the plant
+[Ap, Bp, Cp, Dp, Ts] = ssdata(sys);
 
 nStates = size(Ap, 1);
 nInputs = size(Bp, 2);
@@ -78,7 +78,9 @@ sysCL = ss(Acl, Bcl, Ccl, Dcl, Ts);
 Lz = - ss(Ap - L*Cp - Bp*K, Bp, K, 0, Ts) * ss(Am, Bm, Km, 0, Ts) * ss(Ap, Bp, Cp, 0, Ts) ...
      + ss(Ap - L*Cp - Bp*K, L, K, 0, Ts) * ss(Ap, Bp, Cp, 0, Ts) ...
      + ss(Am, Bm, Km, 0, Ts) * ss(Ap, Bp, Cp, 0, Ts);
- 
 
+Lz2 = ss(Ap - L*Cp - Bp*K, Bp, K, 0, Ts) * ss(Am, Bm, Km, 0, Ts) * ss(Ap, Bp, Cp, 0, Ts) ...
+     + ss(Ap - L*Cp - Bp*K, L, K, 0, Ts) * ss(Ap, Bp, Cp, 0, Ts) ...
+     - ss(Am, Bm, Km, 0, Ts) * ss(Ap, Bp, Cp, 0, Ts);
 end
 
