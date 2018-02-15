@@ -1,9 +1,9 @@
-function analysisGivenLoopGain( loopGain, iDt )
+function analysisGivenLoopGain( loopGain, idt )
 %ANALYSISGIVENLOOPGAIN Given loop again, conduct the analysis.
 %   With loop gain as the input, analyze the stability, transient response,
 %   steady state response, and robust stability.
 %   :param loopGain: Loop gain
-%   :param iDt: Indicator value for smart plotting
+%   :param idt: Indicator value for smart plotting
 
     % Stability Margins
     [Gm, Pm, Wcg, Wcp] = margin(loopGain);
@@ -11,7 +11,7 @@ function analysisGivenLoopGain( loopGain, iDt )
     disp(['GM: ', num2str(Gm_dB), '  dB @ ', num2str(Wcg), ' Hz']);
     disp(['PM: ', num2str(Pm), ' deg @ ', num2str(Wcp), ' Hz']);
     
-    figure(iDt*10+3);
+    figure(idt*10+3);
     [mag,phase,wout] = bode(loopGain);
     subplot(2,1,1);
     semilogx(wout, 20*log10(squeeze(mag)), '-b'); hold on;
@@ -25,7 +25,7 @@ function analysisGivenLoopGain( loopGain, iDt )
     semilogx(wout, -180*ones(size(wout)), 'k--'); %xlim([1e-1, 1e5])
     grid on;
      
-    figure(iDt*10+4);
+    figure(idt*10+4);
     nyquist(loopGain); title(['Nyquist'])
     axis equal;    grid;
 
@@ -34,13 +34,13 @@ function analysisGivenLoopGain( loopGain, iDt )
     S_peak = getPeakGain(S);
     VGM = S_peak / (S_peak - 1);
 
-    figure(iDt*10+5);
+    figure(idt*10+5);
     bodemag(S); title(['Sensitivity']);
 
     % Complementary Sensitivity
-    T = feedback(loopGain, 1);
+    T = 1-S; % feedback(loopGain, 1);
 
-    figure(iDt*10+6);
+    figure(idt*10+6);
     bodemag(T); title(['Complementary Sensitivity']);
     
 end

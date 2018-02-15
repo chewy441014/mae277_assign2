@@ -91,9 +91,17 @@ sys_sefb = sysStateEstimatorFeedback(sys_d, K_d, L_d); % Unnecessary since dcont
 sineWaveTracker(sys_CL, 2, Ts);
 
 %% Problem # 7.b
-
+idt = 70; % Plot indicator
 [sys_CLModel, loopGainModel] = sysStateEstimatorFeedbackWithModel(sys_d, 2);
 
+figure(idt*10 + 1);
+bode(sys_CLModel); title('Closed-Loop Plant with Internal Model Frequency Response');
+
+figure(idt*10 + 2);
+step(sys_CLModel); title('Closed-Loop Plant with Internal Model Step Response');
+stepInfoCLModel = stepinfo(sys_CLModel);
+
+figure(idt*10 + 7);
 sineWaveTracker(sys_CLModel, 2, Ts);
 
 analysisGivenLoopGain( loopGainModel, 70);

@@ -1,6 +1,6 @@
-function analysis(iDt, sysModel, sysCL, K, L, Hz)
+function analysis(idt, sysModel, sysCL, K, L, Hz)
     %% ============================== %%
-    % :param iDt: Indicator value for smart plotting
+    % :param idt: Indicator value for smart plotting
     % :param sysModel: System data
     % :param sysCL: Closed loop model
     % :param K: Controller gain
@@ -24,12 +24,12 @@ function analysis(iDt, sysModel, sysCL, K, L, Hz)
     %% ============================== %%
     %% Closed-loop Plant Frequency Response
     sysCL_Gc = sysCL * N;
-    figure(iDt*10+1);
+    figure(idt*10+1);
     bode(sysCL_Gc); title('Closed-Loop Plant Frequency Response');
 
     %% ============================== %%
     %% Time-Domain Analysis
-    figure(iDt*10+2);
+    figure(idt*10+2);
     step(sysCL_Gc); title('Step Response');
     stepInfo = stepinfo(sysCL_Gc)
 
@@ -46,5 +46,5 @@ function analysis(iDt, sysModel, sysCL, K, L, Hz)
     loopGain = minreal(series(-ctrlFB, sysModel));
     
     % Analysis
-    analysisGivenLoopGain(loopGain, iDt);
+    analysisGivenLoopGain(loopGain, idt);
 end
