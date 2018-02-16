@@ -1,0 +1,2 @@
+C:\Users\pong0923\Google Drive\Lecture\Academic Year 2017-18\2017 Winter\MAE277 Advanced Mechatronics\HW 2\mae277_assign2\LabView\MAE277\MAE277.lvproj (MAE277.lvproj)
+    - The control expected to be at "C:\Users\pong0923\Google Drive\Lecture\Academic Year 2017-18\2017 Winter\MAE277 Advanced Mechatronics\HW 2\mae277_assign2\LabView\MAE277\SubVI\input Type.ctl" was loaded from "C:\Users\pong0923\Google Drive\Lecture\Academic Year 2017-18\2017 Winter\MAE277 Advanced Mechatronics\HW 2\mae277_assign2\LabView Code\SubVI\input Type.ctl".
