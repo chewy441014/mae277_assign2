@@ -57,7 +57,7 @@ disp(rank(obsv(sys_c.A,sys_c.C)));
 
 %% Indirect Digital Control Design
 [K_i,L_i,sys_id] = dcontrold_ind(sys_c, pole_K, pole_L);
-analysis(sys_c, sys_id, K_i, L_i);
+analysis(10, sys_c, sys_id, K_i, L_i);
 
 % sys_id is the indirect design estimator feedback system
 
@@ -69,7 +69,7 @@ analysis(sys_c, sys_id, K_i, L_i);
     pole_L_DT = exp(pole_L * Ts);
     [K_d,L_d, N_d, sys_d, sys_CL] = dcontrold_dir(sys_c, pole_K_DT, pole_L_DT, Ts);
     
-    % analysis(sys_c, sys_CL, K_d, L_d, 1/Ts);
+    analysis(20, sys_c, sys_CL, K_d, L_d, 1/Ts);
 % end
     
 
@@ -85,11 +85,23 @@ analysis(sys_c, sys_id, K_i, L_i);
 %% Problem # 7.a
 
 % State estimator feedback matrix
-sys_sefb = sysStateEstimatorFeedback(sys_dd, K_d, L_d);
+sys_sefb = sysStateEstimatorFeedback(sys_d, K_d, L_d); % Unnecessary since dcontrol_dir() now also returns the CL sys
 
 % Track a 2 Hz sine wave without an internal model
-sineWaveTracker(sys_sefb, 2, Ts);
+sineWaveTracker(sys_CL, 2, Ts);
 
 %% Problem # 7.b
+idt = 70; % Plot indicator
+[sys_CLModel, loopGainModel] = sysStateEstimatorFeedbackWithModel(sys_d, 2);
 
-[sys_CLModel, LzModel] = sysStateEstimatorFeedbackWithModel(sys_dd, 2);
+figure(idt*10 + 1);
+bode(sys_CLModel); title('Closed-Loop Plant with Internal Model Frequency Response');
+
+figure(idt*10 + 2);
+step(sys_CLModel); title('Closed-Loop Plant with Internal Model Step Response');
+stepInfoCLModel = stepinfo(sys_CLModel);
+
+figure(idt*10 + 7);
+sineWaveTracker(sys_CLModel, 2, Ts);
+
+analysisGivenLoopGain( loopGainModel, 70, 1/Ts);
