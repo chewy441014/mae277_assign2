@@ -64,7 +64,6 @@ analysis(10, sys_c, sys_id, K_i, L_i);
 %% Direct Digital Control Design
 for tdx = 1:length(T)
     Ts = T(tdx);
-    Ts = 1/1000;
     pole_K_DT = exp(pole_K * Ts);
     pole_L_DT = exp(pole_L * Ts);
     [K_d,L_d, N_d, sys_d, sys_CL] = dcontrold_dir(sys_c, pole_K_DT, pole_L_DT, Ts);
