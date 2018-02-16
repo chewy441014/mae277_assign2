@@ -1,31 +1,22 @@
-function [K,L,sysCL] = dcontrold_ind(sys_c, desFbPoles, desObsPoles)
+function [K,L,sysCL] = dcontrold_ind(sys_c, desFbPoles, desObsPoles, Ts)
 % :param sys_c: Actual system
 % :param desFPPoles: Desired feedback poles
 % :param desObsPoles: Desired observer poles
-
-    % Controller is discretized for:
-    T = [1/10,1/100,1/1000]; 
     
     % Takes the continuous time LTI open loop plant and applies 
     % state estimator feedback control.
-    [Ac, Bc, Cc, Dc] = ssdata(sys_c);
-    nStates = size(Ac, 1);
-    nInputs = size(Bc, 2);
-    nOutputs = size(Cc, 1);
+    [A, B, C, D] = ssdata(sys_c);
     
     % Estimator and State Feedback gains are decided by 
     % continuous time plant analysis
-    K = place(Ac, Bc, desFbPoles);
-    L = place(Ac', Cc', desObsPoles).';
+    K = place(A, B, desFbPoles);
+    L = place(A', C', desObsPoles).';
     
-    % Stabilized system
-    A_stb = Ac - Bc*K;
-    
-    % Feedforward gain
-    N = 1 / (Cc * inv(-A_stb) * Bc);
-    
-    % Return the observer and state feedback gains and the 
-    % new system model for analysis
-    sysCL = minreal(ss(A_stb, Bc, Cc, zeros(nInputs, nOutputs)));
+    Ao = [A - B*K, B*K; zeros(size(A)), A - L*C];
+    Bo = [B; zeros(size(B))];
+    Co = [C, zeros((size(C)))];
+    sysCL = c2d(minreal(ss(Ao, Bo, Co, 0)),Ts);
     sysCL.Name = 'Indirect Control';
+
+    %N = 1 / (C * inv(eye(size(sysCL.A))-sysCL.A) * B);
 end

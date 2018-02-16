@@ -43,10 +43,8 @@ D =                                                                   0;
 
 sys_c = ss(A,B,C,D); % poles @  11.7020, -16.6797
 
-% pole_K = [-40+10j, -40-10j];
-% pole_L = [-160+10j, -160-10j];%pole_K*10;
 pole_K = [-200+10j, -200-10j];
-pole_L = [-2400+10j, -2400-10j];%pole_K*10;
+pole_L = [-240+10j, -240-10j];%pole_L = [-2400+10j, -2400-10j];
 
 %% Controllability & Observability of the Continuous-Time
 % Open Loop System
@@ -55,9 +53,15 @@ disp(rank(ctrb(sys_c.A,sys_c.B)));
 disp('Observability of CT System');
 disp(rank(obsv(sys_c.A,sys_c.C)));
 
+f = fullfile('data','id_data','id_data.csv');
+Wr = error_bound(f);
+
 %% Indirect Digital Control Design
-[K_i,L_i,sys_id] = dcontrold_ind(sys_c, pole_K, pole_L);
-analysis(10, sys_c, sys_id, K_i, L_i);
+for tdx = 1:length(T)
+    Ts = T(tdx);
+    [K_i,L_i,sys_id] = dcontrold_ind(sys_c, pole_K, pole_L, Ts);
+    analysis(10+tdx, sys_c, sys_id, K_i, L_i, 1/Ts, Wr);
+end
 
 % sys_id is the indirect design estimator feedback system
 
@@ -67,25 +71,14 @@ for tdx = 1:length(T)
     pole_K_DT = exp(pole_K * Ts);
     pole_L_DT = exp(pole_L * Ts);
     [K_d,L_d, N_d, sys_d, sys_CL] = dcontrold_dir(sys_c, pole_K_DT, pole_L_DT, Ts);
-    
-    analysis(20, sys_c, sys_CL, K_d, L_d, 1/Ts);
+    analysis(20+tdx, sys_c, sys_CL, K_d, L_d, 1/Ts, Wr);
 end
-    
+Ts = T(end); %explicitly pick Ts
 
 %% simulation
 [ Ref, Time, y_lti, y_nl, u_lti, u_nl ] = simulation(sys_d, K_d, L_d, N_d);
 
-% Step Response % TODO
-% opt = stepDataOptions('StepAmplitude',0.2);
-% step(sys_dd{1},sys_dd{2},sys_dd{3},opt); title('Step Response Comparison');
-% legend(sys_dd{1}.Name,sys_dd{2}.Name,sys_dd{3}.Name,'Location','southeast')
-
-
 %% Problem # 7.a
-
-% State estimator feedback matrix
-sys_sefb = sysStateEstimatorFeedback(sys_d, K_d, L_d); % Unnecessary since dcontrol_dir() now also returns the CL sys
-
 % Track a 2 Hz sine wave without an internal model
 sineWaveTracker(sys_CL, 2, Ts);
 
@@ -103,4 +96,4 @@ stepInfoCLModel = stepinfo(sys_CLModel);
 figure(idt*10 + 7);
 sineWaveTracker(sys_CLModel, 2, Ts);
 
-analysisGivenLoopGain( loopGainModel, 70, 1/Ts);
+analysisGivenLoopGain( loopGainModel, idt, 1/Ts);

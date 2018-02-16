@@ -1,4 +1,4 @@
-function analysisGivenLoopGain( loopGain, idt , Hz)
+function analysisGivenLoopGain( loopGain, idt , Hz, Wr)
 %ANALYSISGIVENLOOPGAIN Given loop again, conduct the analysis.
 %   With loop gain as the input, analyze the stability, transient response,
 %   steady state response, and robust stability.
@@ -33,7 +33,7 @@ function analysisGivenLoopGain( loopGain, idt , Hz)
     % Sensitivity
     S = 1/(1 + loopGain); % feedback(1,loopGain);
     S_peak = getPeakGain(S);
-    VGM = S_peak / (S_peak - 1);
+    VGM = S_peak / (S_peak - 1)
 
     figure(idt*10+5);
     bodemag(S); title(['Sensitivity']);
@@ -45,13 +45,13 @@ function analysisGivenLoopGain( loopGain, idt , Hz)
     bodemag(T); title(['Complementary Sensitivity']);
     
     % Error Bound
-    Wr = error_bound('chirp.csv');
-    if Hz == 0
-        figure; bodemag(T, 1/Wr, 'r--'); legend('T(z)','1/Wr(z)'); title('Robust Stability');
-    else
-        Wr_d = c2d(Wr, 1/Hz, 'Tustin');
-        figure; bodemag(T, 1/Wr_d, 'r--'); legend('T(z)','1/Wr(z)'); title([num2str(Hz),' Hz Robust Stability']);
+    if nargin > 3
+        if Hz == 0
+            figure(idt*10+7); bodemag(T, 1/Wr, 'r--'); legend('T(z)','1/Wr(z)'); title('Robust Stability');
+        else
+            Wr_d = c2d(Wr, 1/Hz, 'Tustin');
+            figure(idt*10+7); bodemag(T, 1/Wr_d, 'r--'); legend('T(z)','1/Wr(z)'); title([num2str(Hz),' Hz Robust Stability']);
+        end
     end
-    
 end
 

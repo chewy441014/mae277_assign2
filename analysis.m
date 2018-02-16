@@ -1,4 +1,4 @@
-function analysis(idt, sysModel, sysCL, K, L, Hz)
+function analysis(idt, sysModel, sysCL, K, L, Hz, Wr)
     %% ============================== %%
     % :param idt: Indicator value for smart plotting
     % :param sysModel: System data
@@ -46,5 +46,5 @@ function analysis(idt, sysModel, sysCL, K, L, Hz)
     loopGain = minreal(series(-ctrlFB, sysModel));
     
     % Analysis
-    analysisGivenLoopGain(loopGain, idt, Hz);
+    analysisGivenLoopGain(loopGain, idt, Hz, Wr);
 end
