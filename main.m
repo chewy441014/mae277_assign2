@@ -45,8 +45,8 @@ sys_c = ss(A,B,C,D); % poles @  11.7020, -16.6797
 
 % pole_K = [-40+10j, -40-10j];
 % pole_L = [-160+10j, -160-10j];%pole_K*10;
-pole_K = [-40+10j, -40-10j];
-pole_L = [-20000+10j, -20000-10j];%pole_K*10;
+pole_K = [-200+10j, -200-10j];
+pole_L = [-2400+10j, -2400-10j];%pole_K*10;
 
 %% Controllability & Observability of the Continuous-Time
 % Open Loop System
@@ -62,15 +62,15 @@ analysis(10, sys_c, sys_id, K_i, L_i);
 % sys_id is the indirect design estimator feedback system
 
 %% Direct Digital Control Design
-% for tdx = 1:length(T)
-%     Ts = T(tdx);
+for tdx = 1:length(T)
+    Ts = T(tdx);
     Ts = 1/1000;
     pole_K_DT = exp(pole_K * Ts);
     pole_L_DT = exp(pole_L * Ts);
     [K_d,L_d, N_d, sys_d, sys_CL] = dcontrold_dir(sys_c, pole_K_DT, pole_L_DT, Ts);
     
     analysis(20, sys_c, sys_CL, K_d, L_d, 1/Ts);
-% end
+end
     
 
 %% simulation
