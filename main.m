@@ -104,4 +104,4 @@ stepInfoCLModel = stepinfo(sys_CLModel);
 figure(idt*10 + 7);
 sineWaveTracker(sys_CLModel, 2, Ts);
 
-analysisGivenLoopGain( loopGainModel, 70);
+analysisGivenLoopGain( loopGainModel, 70, 1/Ts);

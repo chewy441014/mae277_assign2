@@ -1,9 +1,10 @@
-function analysisGivenLoopGain( loopGain, idt )
+function analysisGivenLoopGain( loopGain, idt , Hz)
 %ANALYSISGIVENLOOPGAIN Given loop again, conduct the analysis.
 %   With loop gain as the input, analyze the stability, transient response,
 %   steady state response, and robust stability.
 %   :param loopGain: Loop gain
 %   :param idt: Indicator value for smart plotting
+%   :param Hz: frequency label for plot titles
 
     % Stability Margins
     [Gm, Pm, Wcg, Wcp] = margin(loopGain);
@@ -42,6 +43,15 @@ function analysisGivenLoopGain( loopGain, idt )
 
     figure(idt*10+6);
     bodemag(T); title(['Complementary Sensitivity']);
+    
+    % Error Bound
+    Wr = error_bound('chirp.csv');
+    if Hz == 0
+        figure; bodemag(T, 1/Wr, 'r--'); legend('T(z)','1/Wr(z)'); title('Robust Stability');
+    else
+        Wr_d = c2d(Wr, 1/Hz, 'Tustin');
+        figure; bodemag(T, 1/Wr_d, 'r--'); legend('T(z)','1/Wr(z)'); title([num2str(Hz),' Hz Robust Stability']);
+    end
     
 end
 

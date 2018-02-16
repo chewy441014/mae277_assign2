@@ -46,5 +46,5 @@ function analysis(idt, sysModel, sysCL, K, L, Hz)
     loopGain = minreal(series(-ctrlFB, sysModel));
     
     % Analysis
-    analysisGivenLoopGain(loopGain, idt);
+    analysisGivenLoopGain(loopGain, idt, Hz);
 end
