@@ -66,14 +66,15 @@ end
 % sys_id is the indirect design estimator feedback system
 
 %% Direct Digital Control Design
-for tdx = 1:length(T)
+% for tdx = 1:length(T)
+    tdx = 3;
     Ts = T(tdx);
     pole_K_DT = exp(pole_K * Ts);
     pole_L_DT = exp(pole_L * Ts);
     [K_d,L_d, N_d, sys_d, sys_CL] = dcontrold_dir(sys_c, pole_K_DT, pole_L_DT, Ts);
     analysis(20+tdx, sys_c, sys_CL, K_d, L_d, 1/Ts, Wr);
-end
-Ts = T(end); %explicitly pick Ts
+% end
+% Ts = T(end); %explicitly pick Ts
 
 %% simulation
 [ Ref, Time, y_lti, y_nl, u_lti, u_nl ] = simulation(sys_d, K_d, L_d, N_d);
