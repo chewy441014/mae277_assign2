@@ -67,6 +67,7 @@ end
 
 %% Direct Digital Control Design
 for tdx = 1:length(T)
+    tdx = 3;
     Ts = T(tdx);
     pole_K_DT = exp(pole_K * Ts);
     pole_L_DT = exp(pole_L * Ts);
@@ -77,17 +78,25 @@ Ts = T(end); %explicitly pick Ts
 
 %% simulation
 [ Ref_d, Time_d, y_lti_d, y_nl_d, u_lti_d, u_nl_d ] = simulation(sys_d, K_d, L_d, N_d);
-[ Ref_i, Time_i, y_lti_i, y_nl_i, u_lti_i, u_nl_i ] = simulation(sys_c, K_i, L_i, N_id);
+%[ Ref_i, Time_i, y_lti_i, y_nl_i, u_lti_i, u_nl_i ] = simulation(sys_c, K_i, L_i, N_id);
 
 % Verify the LTI Direct Digital Control Design with Simulations Results
 data_d = [Ref_d, Time_d, y_lti_d, y_nl_d, u_lti_d, u_nl_d];
-data_i = [Ref_i, Time_i, y_lti_i, y_nl_i, u_lti_i, u_nl_i];
+%data_i = [Ref_i, Time_i, y_lti_i, y_nl_i, u_lti_i, u_nl_i];
 verify_design(data_d,30);
-verify_design(data_i,40);
+%verify_design(data_i,40);
 
 %% Problem # 7.a
 % Track a 2 Hz sine wave without an internal model
-sineWaveTracker(sys_CL, 2, Ts);
+QKnm_sin = 10000*eye(2);
+RKnm_sin =0.01;
+QLnm_sin = 10;
+RLnm_sin = 0.01;
+[pole_K_DT_sine_nomodel, ~, ~] = dlqr(sys_d.A, sys_d.B, QKnm_sin, RKnm_sin);
+[~, pole_L_DT_sine_nomodel, ~, ~] = kalman(sys_d, QLnm_sin, RLnm_sin);
+[~, ~, ~, ~, sys_CLNoModel] = dcontrold_dir(sys_c, pole_K_DT_sine_nomodel, pole_L_DT_sine_nomodel, Ts);
+sineWaveTracker(sys_CLNoModel, 2, Ts, 61);
+% sineWaveTracker(sys_CL, 2, Ts);
 
 %% Problem # 7.b
 idt = 70; % Plot indicator
@@ -100,7 +109,6 @@ figure(idt*10 + 2);
 step(sys_CLModel); title('Closed-Loop Plant with Internal Model Step Response');
 stepInfoCLModel = stepinfo(sys_CLModel);
 
-figure(idt*10 + 7);
-sineWaveTracker(sys_CLModel, 2, Ts);
+sineWaveTracker(sys_CLModel, 2, Ts, idt*10+8);
 
 analysisGivenLoopGain( loopGainModel, idt, 1/Ts);
