@@ -80,7 +80,15 @@ Ts = T(end); %explicitly pick Ts
 
 %% Problem # 7.a
 % Track a 2 Hz sine wave without an internal model
-sineWaveTracker(sys_CL, 2, Ts);
+QKnm_sin = 10000*eye(2);
+RKnm_sin =0.01;
+QLnm_sin = 10;
+RLnm_sin = 0.01;
+[pole_K_DT_sine_nomodel, ~, ~] = dlqr(sys_d.A, sys_d.B, QKnm_sin, RKnm_sin);
+[~, pole_L_DT_sine_nomodel, ~, ~] = kalman(sys_d, QLnm_sin, RLnm_sin);
+[~, ~, ~, ~, sys_CLNoModel] = dcontrold_dir(sys_c, pole_K_DT_sine_nomodel, pole_L_DT_sine_nomodel, Ts);
+sineWaveTracker(sys_CLNoModel, 2, Ts);
+% sineWaveTracker(sys_CL, 2, Ts);
 
 %% Problem # 7.b
 idt = 70; % Plot indicator
