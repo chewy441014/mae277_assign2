@@ -59,7 +59,7 @@ Wr = error_bound(f);
 %% Indirect Digital Control Design
 for tdx = 1:length(T)
     Ts = T(tdx);
-    [K_i,L_i,sys_id] = dcontrold_ind(sys_c, pole_K, pole_L, Ts);
+    [K_i,L_i,sys_id,N_id] = dcontrold_ind(sys_c, pole_K, pole_L, Ts);
     analysis(10+tdx, sys_c, sys_id, K_i, L_i, 1/Ts, Wr);
 end
 
@@ -76,7 +76,14 @@ end
 Ts = T(end); %explicitly pick Ts
 
 %% simulation
-[ Ref, Time, y_lti, y_nl, u_lti, u_nl ] = simulation(sys_d, K_d, L_d, N_d);
+[ Ref_d, Time_d, y_lti_d, y_nl_d, u_lti_d, u_nl_d ] = simulation(sys_d, K_d, L_d, N_d);
+[ Ref_i, Time_i, y_lti_i, y_nl_i, u_lti_i, u_nl_i ] = simulation(sys_c, K_i, L_i, N_id);
+
+% Verify the LTI Direct Digital Control Design with Simulations Results
+data_d = [Ref_d, Time_d, y_lti_d, y_nl_d, u_lti_d, u_nl_d];
+data_i = [Ref_i, Time_i, y_lti_i, y_nl_i, u_lti_i, u_nl_i];
+verify_design(data_d,30);
+verify_design(data_i,40);
 
 %% Problem # 7.a
 % Track a 2 Hz sine wave without an internal model
