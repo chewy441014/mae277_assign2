@@ -8,7 +8,7 @@ clc; clear; close all;
 % Motor Parameters
 global LinkLength LinkMass Vs R_motor L_motor J_total b_motor g Km Kb
 LinkLength = 75.39e-3;      % 75.30 mm
-LinkMass   = 45.73-3;       % 45.73 grams
+LinkMass   = 45.73E-3;       % 45.73 grams
 % Km       = 22.7E-3;       % 22.7 mNm/A
 Vs         = 12;            % 12 V
 % R_motor    = 8.0061;        % 8.0061 Ohm
