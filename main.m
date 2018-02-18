@@ -112,12 +112,12 @@ idt = 70; % Plot indicator
 [sys_CLModel, loopGainModel] = sysStateEstimatorFeedbackWithModel(sys_d, 2);
 
 figure(idt*10 + 1);
-bode(sys_CLModel); title('Closed-Loop Plant with Internal Model Frequency Response');
+bode(sys_CLModel); title('Closed-Loop Plant with Internal Model Frequency Response'); grid on;
 
 figure(idt*10 + 2);
-step(sys_CLModel); title('Closed-Loop Plant with Internal Model Step Response');
-stepInfoCLModel = stepinfo(sys_CLModel);
+step(sys_CLModel); title('Closed-Loop Plant with Internal Model Step Response'); grid on;
+stepInfoCLModel = stepinfo(sys_CLModel)
 
-sineWaveTracker(sys_CLModel, 0, 71, 2, Ts);
+sineWaveTracker(sys_CLModel, 0, 79, 2, Ts);
 
 analysisGivenLoopGain( loopGainModel, idt, 1/Ts);

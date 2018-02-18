@@ -23,6 +23,11 @@ Cm = [  1   0   ];
 
 Dm = 0;
 
+% Am = 1;
+% Bm = 1;
+% Cm = 1;
+% Dm = 0;
+
 sys_M = ss(Am, Bm, Cm, Dm, Ts);
 
 nStatesModel = size(Am, 1);
@@ -45,9 +50,12 @@ Caug = [    Cp,             zeros(nOutputsModel, nStatesModel)   ];
 
 %% =============================== %%
 %% State Feedback Controller
-Qfb = [ 100000*eye(2),  zeros(2,2)      ;
-        zeros(2,2),     100000*eye(2)    ];
-Rfb = 1000000;
+Qfb = [ 10,      0,          0,          0   ;
+        0,          0.001,      0,          0   ;
+        0,          0,          10,      0   ;
+        0,          0,          0,          0.001  ];
+% Qfb = [10000, 0, 0; 0, 1000, 0; 0, 0, 10];
+Rfb = 100;
 [Kaug, ~, ~] = dlqr(Aaug, Baug, Qfb, Rfb);
 K = Kaug(1:nStates);
 Km = Kaug(nStates + 1:end);
@@ -55,7 +63,7 @@ Km = Kaug(nStates + 1:end);
 %% =============================== %%
 %% State Observer
 Qob = 10;
-Rob = 0.01;
+Rob = 1;
 
 [~, L, ~, ~] = kalman(sys, Qob, Rob);
 
@@ -71,9 +79,8 @@ Ccl = [ Caug,       zeros(nOutputs, nStates)    ];
 
 Dcl = 0;
 
-sysCL = ss(Acl, Bcl, Ccl, Dcl, Ts);
-eig_Acl = eig(Acl);
-disp(['Eigenvalues of closed loop poles: ', eig_Acl]);
+sysCL = minreal(ss(Acl, Bcl, Ccl, Dcl, Ts));
+
 
 %% =============================== %%
 %% Loop Gain %%
@@ -84,5 +91,10 @@ Lz = - ss(Ap - L*Cp - Bp*K, Bp, K, 0, Ts) * ss(Am, Bm, Km, 0, Ts) * ss(Ap, Bp, C
 Lz2 = ss(Ap - L*Cp - Bp*K, Bp, K, 0, Ts) * ss(Am, Bm, Km, 0, Ts) * ss(Ap, Bp, Cp, 0, Ts) ...
      + ss(Ap - L*Cp - Bp*K, L, K, 0, Ts) * ss(Ap, Bp, Cp, 0, Ts) ...
      - ss(Am, Bm, Km, 0, Ts) * ss(Ap, Bp, Cp, 0, Ts);
+
+Laug = [    L       ;
+            Bm      ];
+ 
+Lz3 = ss(Aaug - Laug*Caug - Baug*Kaug, Laug, Kaug, 0, Ts)*ss(Aaug, Baug, Caug, 0, Ts);
 end
 
