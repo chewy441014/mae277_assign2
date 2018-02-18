@@ -72,6 +72,8 @@ Ccl = [ Caug,       zeros(nOutputs, nStates)    ];
 Dcl = 0;
 
 sysCL = ss(Acl, Bcl, Ccl, Dcl, Ts);
+eig_Acl = eig(Acl);
+disp(['Eigenvalues of closed loop poles: ', eig_Acl]);
 
 %% =============================== %%
 %% Loop Gain %%
