@@ -43,8 +43,8 @@ D =                                                                   0;
 
 sys_c = ss(A,B,C,D); % poles @  11.7020, -16.6797
 
-pole_K = [-200+10j, -200-10j];
-pole_L = [-240+10j, -240-10j];%pole_L = [-2400+10j, -2400-10j];
+pole_K = [ -40+10i, -40-10i];
+pole_L = [-160+10i, -160-10i];
 
 %% Controllability & Observability of the Continuous-Time
 % Open Loop System
@@ -59,25 +59,31 @@ Wr = error_bound(f);
 %% Indirect Digital Control Design
 for tdx = 1:length(T)
     Ts = T(tdx);
-    [K_i,L_i,sys_id] = dcontrold_ind(sys_c, pole_K, pole_L, Ts);
+    [K_i,L_i,sys_id,N_id] = dcontrold_ind(sys_c, pole_K, pole_L, Ts);
     analysis(10+tdx, sys_c, sys_id, K_i, L_i, 1/Ts, Wr);
 end
 
 % sys_id is the indirect design estimator feedback system
 
 %% Direct Digital Control Design
-% for tdx = 1:length(T)
-    tdx = 3;
+for tdx = 1:length(T)
     Ts = T(tdx);
     pole_K_DT = exp(pole_K * Ts);
     pole_L_DT = exp(pole_L * Ts);
     [K_d,L_d, N_d, sys_d, sys_CL] = dcontrold_dir(sys_c, pole_K_DT, pole_L_DT, Ts);
     analysis(20+tdx, sys_c, sys_CL, K_d, L_d, 1/Ts, Wr);
-% end
-% Ts = T(end); %explicitly pick Ts
+end
+Ts = T(end); %explicitly pick Ts
 
 %% simulation
-[ Ref, Time, y_lti, y_nl, u_lti, u_nl ] = simulation(sys_d, K_d, L_d, N_d);
+[ Ref_d, Time_d, y_lti_d, y_nl_d, u_lti_d, u_nl_d ] = simulation(sys_d, K_d, L_d, N_d);
+[ Ref_i, Time_i, y_lti_i, y_nl_i, u_lti_i, u_nl_i ] = simulation(sys_c, K_i, L_i, N_id);
+
+% Verify the LTI Direct Digital Control Design with Simulations Results
+data_d = [Ref_d, Time_d, y_lti_d, y_nl_d, u_lti_d, u_nl_d];
+data_i = [Ref_i, Time_i, y_lti_i, y_nl_i, u_lti_i, u_nl_i];
+verify_design(data_d,30);
+verify_design(data_i,40);
 
 %% Problem # 7.a
 % Track a 2 Hz sine wave without an internal model
@@ -88,8 +94,6 @@ RLnm_sin = 0.01;
 [pole_K_DT_sine_nomodel, ~, ~] = dlqr(sys_d.A, sys_d.B, QKnm_sin, RKnm_sin);
 [~, pole_L_DT_sine_nomodel, ~, ~] = kalman(sys_d, QLnm_sin, RLnm_sin);
 [~, ~, ~, ~, sys_CLNoModel] = dcontrold_dir(sys_c, pole_K_DT_sine_nomodel, pole_L_DT_sine_nomodel, Ts);
-sineWaveTracker(sys_CLNoModel, 2, Ts);
-% sineWaveTracker(sys_CL, 2, Ts);
 
 %% Problem # 7.b
 idt = 70; % Plot indicator
@@ -102,7 +106,7 @@ figure(idt*10 + 2);
 step(sys_CLModel); title('Closed-Loop Plant with Internal Model Step Response');
 stepInfoCLModel = stepinfo(sys_CLModel);
 
-figure(idt*10 + 7);
-sineWaveTracker(sys_CLModel, 2, Ts);
+sineWaveTracker(sys_CLModel, 2, Ts, idt*10+8);
+sineWaveTracker(sys_CLNoModel, 2, Ts, idt*10+9);
 
 analysisGivenLoopGain( loopGainModel, idt, 1/Ts);

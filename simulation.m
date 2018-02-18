@@ -11,15 +11,22 @@ B  = sys.B;
 C  = sys.C;
 D  = sys.D;
 Ts = sys.Ts;
-
-if sys.Ts > 0
-    modelname = 'nonlinear_inverted_pendulum_simulation_direct';
-else
+if Ts == 0
+    Ts = 1/1000; % For indirect design we only consider the ...
+    %controller designed for this loop rate
     modelname = 'nonlinear_inverted_pendulum_simulation_indirect';
+    options = simset('SrcWorkspace','current');%'debug', 'on', 
+else
+    modelname = 'nonlinear_inverted_pendulum_simulation_direct';
+    options = simset('SrcWorkspace','current');
+    
 end
 
+nInputs  = size(B,2);
+nOutputs = size(C,1);
+Ctrl_FB = minreal( -tf( ss(A - L*C - B*K, L, K, zeros(nInputs,nOutputs) ) ) );
+
 % run simulation
-options = simset('SrcWorkspace','current');
 open(modelname);
 sim(modelname,[],options);
 
