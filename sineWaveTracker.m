@@ -1,9 +1,9 @@
-function sineWaveTracker( sys, w, Ts, tend, idt)
+function sineWaveTracker( sys, w, Ts, idt, tend)
 %SINEWAVETRACKER Track a given sinusoidal reference trajectory.
 %   Given a system, track a sinusoid with a frequency of w at Ts for tend
 %   time.
 
-if nargin < 4 % If ending time is not specified
+if nargin < 5 % If ending time is not specified
     tend = 10;
 end
 

@@ -17,6 +17,6 @@ function [K,L,sysCL,N] = dcontrold_ind(sys_c, desFbPoles, desObsPoles, Ts)
     Co = [C, zeros((size(C)))];
     sysCL = c2d(minreal(ss(Ao, Bo, Co, 0)),Ts);
     sysCL.Name = 'Indirect Control';
-    N = 1 / (C * inv(eye(size(sysCL.A))-sysCL.A) * B);
+    N = 1 / (C * inv(eye(size(sysCL.A))-sysCL.A) * sysCL.B);
     
 end
