@@ -17,10 +17,9 @@ J_motor    = 0.00000103;    % 10.3 gcm^2
 b_motor    = 0;             % ~0 Nms
 g          = 9.81;          % 9.81 m/s^2
 
-J_link     = (1/3) * LinkMass * LinkLength ^ 2;
-J_total    = J_motor + J_link;
-% kappa = Vs/Km;
-% tau = J_total*R_dd/(Km^2);
+J_rotor    = (1/12) * LinkMass* LinkLength ^ 2;
+J_pend     = (1/3) * LinkMass * LinkLength ^ 2;
+J_total    = J_motor + J_rotor;
 
 % From System Id
 % [kappa_id, tau_id] = system_id()
@@ -28,9 +27,9 @@ kappa_id = 451.4583;
 tau_id = 0.2009;
 
 % Calc unknown parameters
-Km = Vs/kappa_id;
+Km = Vs/kappa_id; % kappa = Vs/Km;
 Kb = Km;
-R_motor = tau_id*Km^2 / J_total;
+R_motor = tau_id*Km^2 / J_total; % tau = J_total*R_dd/(Km^2);
 
 T = [1/10, 1/100, 1/1000];
 %% Dynamic Model, Matrix Representation
@@ -53,6 +52,7 @@ disp(rank(ctrb(sys_c.A,sys_c.B)));
 disp('Observability of CT System');
 disp(rank(obsv(sys_c.A,sys_c.C)));
 
+%% Uncertainty Analysis
 f = fullfile('data','id_data','id_data.csv');
 Wr = error_bound(f);
 
@@ -83,6 +83,17 @@ data_d = [Ref_d, Time_d, y_lti_d, y_nl_d, u_lti_d, u_nl_d];
 data_i = [Ref_i, Time_i, y_lti_i, y_nl_i, u_lti_i, u_nl_i];
 verify_design(data_d,30);
 verify_design(data_i,40);
+
+%% Problem # 6
+Ts_id = 0.001;
+% [tau_pend, kappa_pend] = system_id(fullfile('data','stb_pend_id','0.1_2_0.1_10_1.csv'), Ts_id); 0.2843, 74.5012
+% [tau_pend, kappa_pend] = system_id(fullfile('data','stb_pend_id','0.1_2_0.1_10_2.csv'), Ts_id); 0.3072, 75.1188
+% [tau_pend, kappa_pend] = system_id(fullfile('data','stb_pend_id','0.1_200_0.1_30_1.csv'), Ts_id) 0.2293, 47.9749
+% [tau_pend, kappa_pend] = system_id(fullfile('data','stb_pend_id','0.1_200_0.1_30_2.csv'), Ts_id) 0.2145, 59.5724
+
+kappa_pend_expect = Vs / Kb;
+J_total = J_rotor + J_motor;
+tau_pend_expect = J_total*R_motor/(Km*Kb);
 
 %% Problem # 7.a
 % Track a 2 Hz sine wave without an internal model
