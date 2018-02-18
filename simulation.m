@@ -24,7 +24,8 @@ end
 
 nInputs  = size(B,2);
 nOutputs = size(C,1);
-Ctrl_FB = minreal( -tf( ss(A - L*C - B*K, L, K, zeros(nInputs,nOutputs) ) ) );
+Ctrl_FB = minreal( -tf( ss(A - L*C - B*K, L, K, zeros(nInputs,nOutputs))));
+Ctrl_FF = minreal( -tf( ss(A - L*C - B*K, B, K, zeros(nInputs,nOutputs))));
 
 % run simulation
 open(modelname);
