@@ -21,9 +21,11 @@ unl = unl(1:n);
 figure(idt+1);
 plot(t,y,t,ynl); title('Control Simulation Output Comparison'); 
 xlabel('Time (s)'); ylabel('Theta (rad)');
+legend('LTI Model Response','NL Model Response');
 
 figure(idt+2);
 plot(t,u,t,unl); title('Control Simulation Control Effort Comparison'); 
 xlabel('Time (s)'); ylabel('Control Effort');
+legend('LTI Model Control Effor','NL Model Control Effort');
 
 end

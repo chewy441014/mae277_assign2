@@ -3,7 +3,11 @@ function sineWaveTracker( sys, N, idt, w, Ts, tend)
 %   Given a system, track a sinusoid with a frequency of w at Ts for tend
 %   time.
 
+<<<<<<< HEAD
 if nargin < 6 % If ending time is not specified
+=======
+if nargin < 5 % If ending time is not specified
+>>>>>>> 5fb6f2fe4468d9a34d8f0274f680b34ef82bfbdf
     tend = 10;
 end
 

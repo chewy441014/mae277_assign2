@@ -43,8 +43,8 @@ D =                                                                   0;
 
 sys_c = ss(A,B,C,D); % poles @  11.7020, -16.6797
 
-pole_K = [-200+10j, -200-10j];
-pole_L = [-240+10j, -240-10j];%pole_L = [-2400+10j, -2400-10j];
+pole_K = [ -40+10i, -40-10i];
+pole_L = [-160+10i, -160-10i];
 
 %% Controllability & Observability of the Continuous-Time
 % Open Loop System
@@ -73,18 +73,16 @@ end
     pole_L_DT = exp(pole_L * Ts);
     [K_d,L_d, N_d, sys_d, sys_CL] = dcontrold_dir(sys_c, pole_K_DT, pole_L_DT, Ts);
     analysis(20+tdx, sys_c, sys_CL, K_d, L_d, 1/Ts, Wr);
-% end
-% Ts = T(end); %explicitly pick Ts
 
 %% simulation
 [ Ref_d, Time_d, y_lti_d, y_nl_d, u_lti_d, u_nl_d ] = simulation(sys_d, K_d, L_d, N_d);
-%[ Ref_i, Time_i, y_lti_i, y_nl_i, u_lti_i, u_nl_i ] = simulation(sys_c, K_i, L_i, N_id);
+[ Ref_i, Time_i, y_lti_i, y_nl_i, u_lti_i, u_nl_i ] = simulation(sys_c, K_i, L_i, N_id);
 
 % Verify the LTI Direct Digital Control Design with Simulations Results
 data_d = [Ref_d, Time_d, y_lti_d, y_nl_d, u_lti_d, u_nl_d];
-%data_i = [Ref_i, Time_i, y_lti_i, y_nl_i, u_lti_i, u_nl_i];
+data_i = [Ref_i, Time_i, y_lti_i, y_nl_i, u_lti_i, u_nl_i];
 verify_design(data_d,30);
-%verify_design(data_i,40);
+verify_design(data_i,40);
 
 %% Problem # 7.a
 % Track a 2 Hz sine wave without an internal model

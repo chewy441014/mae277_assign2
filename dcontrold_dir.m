@@ -35,5 +35,5 @@ function [K,L,N, sys_d, sys_CL] = dcontrold_dir(sys_c, Kp, Lp, Ts)
     % Return the observer and state feedback gains and the 
     % new system model for analysis
 
-    N = 1 / (C * inv(eye(size(sys_CL.A))-sys_CL.A) * B);
+    N = 1 / (C * inv(eye(size(sys_CL.A))-sys_CL.A) * sys_CL.B);
 end
